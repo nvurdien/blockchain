@@ -1,27 +1,74 @@
-var express = require('express');
-var path = require('path');
-var favicon = require('serve-favicon');
-var logger = require('morgan');
-var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');
+const express = require('express');
+const path = require('path');
+const favicon = require('serve-favicon');
+const logger = require('morgan');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+const fileUpload = require('express-fileupload');
+const cors = require('cors');
+const msSqlConnecter = require("./msSqlConnector");
 
-var app = express();
+const app = express();
+
+const Tedious = require('tedious');
+
+let config = require('./credentials');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
+app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 app.use(logger('dev'));
+app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(fileUpload());
+app.use('/public', express.static(__dirname + '/public'));
+
+
+app.post('/background', (req, res, next) => {
+  console.log(req.body.username);
+  console.log(req.body.password);
+  console.log(req.body.email);
+  console.log(req.files.file.data);
+    var con = new msSqlConnecter.msSqlConnecter(config);
+    // Attempt to connect and execute queries if connection goes through
+    con.connect().then(function () {
+        new con.Request("insert into AthenaHacks values(@username,@password,@email,@file)")
+            .addParam("username", Tedious.TYPES.VarChar, req.body.username)
+            .addParam("password", Tedious.TYPES.VarChar, req.body.password)
+            .addParam("email", Tedious.TYPES.VarChar, req.body.email)
+            .addParam("file", Tedious.TYPES.VarBinary, req.files.file.data)
+            .onComplate(function (count) {
+                console.log(count);
+            })
+            .onError(function (err) {
+                console.log(err);
+            })
+            .Run();
+    }).catch(function (ex) {
+        console.log(ex);
+    });
+
+
+
+    // let imageFile = req.files.file;
+  //
+  // imageFile.mv(`${__dirname}/public/${req.body.filename}.jpg`, function(err) {
+  //   if (err) {
+  //     return res.status(500).send(err);
+  //   }
+  //
+  //   res.json({file: `public/${req.body.filename}.jpg`});
+  // });
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  var err = new Error('Not Found');
+  const err = new Error('Not Found');
   err.status = 404;
   next(err);
 });
@@ -37,8 +84,8 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.post(function(req,res,next){
-  print(req);
+app.listen(8000, () => {
+  console.log('8000');
 });
 
 module.exports = app;
