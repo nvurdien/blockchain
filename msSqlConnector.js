@@ -21,7 +21,7 @@ module.exports = {
         };
 
         currentConnect.Request = function (sql) {
-            var currentRequest = this;
+            let currentRequest = this;
             currentRequest.sql = sql;
             currentRequest.params = [];
             currentRequest.result = [];
@@ -32,10 +32,10 @@ module.exports = {
             currentRequest.addParam = function (key, type, value) {
                 currentRequest.params.push({ key: key, type: type, value: value });
                 return currentRequest;
-            }
+            };
 
             currentRequest.Run = function () {
-                var request = new Tedious.Request(currentRequest.sql, function (err, rowCount, rows) {
+                let request = new Tedious.Request(currentRequest.sql, function (err, rowCount, rows) {
                     if (err) {
                         currentRequest.errorHandler(err);
                     }
@@ -45,7 +45,7 @@ module.exports = {
                 });
 
                 request.on("row", function (columns) {
-                    var item = {};
+                    let item = {};
                     columns.forEach(function (column) {
 
                         item[column.metadata.colName] = column.value;
@@ -53,8 +53,8 @@ module.exports = {
                     currentRequest.result.push(item);
                 });
 
-                for (var i in currentRequest.params) {
-                    var item = currentRequest.params[i];
+                for (let i in currentRequest.params) {
+                    let item = currentRequest.params[i];
                     request.addParameter(item.key, item.type, item.value);
                 }
 
@@ -72,12 +72,12 @@ module.exports = {
 
                 return currentRequest;
             };
-        }
+        };
 
         currentConnect.connect = function () {
-            var connection = new Tedious.Connection(config);
+            let connection = new Tedious.Connection(config);
             currentConnect.connection = connection;
             return Promise.promisify(connection.on.bind(connection))("connect");
         }
     }
-}
+};

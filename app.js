@@ -30,11 +30,11 @@ app.use('/public', express.static(__dirname + '/public'));
 
 
 app.post('/background', (req, res, next) => {
-  console.log(req.body.username);
-  console.log(req.body.password);
-  console.log(req.body.email);
-  console.log(req.files.file.data);
-    var con = new msSqlConnecter.msSqlConnecter(config);
+    console.log(req.body.username);
+    console.log(req.body.password);
+    console.log(req.body.email);
+    console.log(req.files.file.data);
+    let con = new msSqlConnecter.msSqlConnecter(config);
     // Attempt to connect and execute queries if connection goes through
     con.connect().then(function () {
         new con.Request("insert into AthenaHacks values(@username,@password,@email,@file)")
@@ -52,18 +52,6 @@ app.post('/background', (req, res, next) => {
     }).catch(function (ex) {
         console.log(ex);
     });
-
-
-
-    // let imageFile = req.files.file;
-  //
-  // imageFile.mv(`${__dirname}/public/${req.body.filename}.jpg`, function(err) {
-  //   if (err) {
-  //     return res.status(500).send(err);
-  //   }
-  //
-  //   res.json({file: `public/${req.body.filename}.jpg`});
-  // });
 });
 
 // catch 404 and forward to error handler
