@@ -33,7 +33,7 @@ app.post('/background', (req, res, next) => {
     console.log(req.body.username);
     console.log(req.body.password);
     console.log(req.body.email);
-    console.log(req.body.status);
+    // console.log(req.body.status);
 
 
 
@@ -44,7 +44,7 @@ app.post('/background', (req, res, next) => {
             .addParam("username", Tedious.TYPES.VarChar, req.body.username)
             .addParam("password", Tedious.TYPES.VarChar, req.body.password)
             .addParam("email", Tedious.TYPES.VarChar, req.body.email)
-            .addParam("status", Tedious.TYPES.VarChar, req.body.status)
+            .addParam("status", Tedious.TYPES.VarChar, "yes")
             .onComplate(function (count) {
                 console.log(count);
             })
