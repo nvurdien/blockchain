@@ -33,15 +33,18 @@ app.post('/background', (req, res, next) => {
     console.log(req.body.username);
     console.log(req.body.password);
     console.log(req.body.email);
-    console.log(req.files.file.data);
+    console.log(req.body.status);
+
+
+
     let con = new msSqlConnecter.msSqlConnecter(config);
     // Attempt to connect and execute queries if connection goes through
     con.connect().then(function () {
-        new con.Request("insert into AthenaHacks values(@username,@password,@email,@file)")
+        new con.Request("insert into AthenaHacks values(@username,@password,@email,@status)")
             .addParam("username", Tedious.TYPES.VarChar, req.body.username)
             .addParam("password", Tedious.TYPES.VarChar, req.body.password)
             .addParam("email", Tedious.TYPES.VarChar, req.body.email)
-            .addParam("file", Tedious.TYPES.VarBinary, req.files.file.data)
+            .addParam("status", Tedious.TYPES.VarChar, req.body.status)
             .onComplate(function (count) {
                 console.log(count);
             })
